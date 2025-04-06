@@ -10,7 +10,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 
 let db
-const url = 'mongodb+srv://admin:password*@test.mjxts8v.mongodb.net/?retryWrites=true&w=majority&appName=test'
+const url = 'mongodb+srv://admin:password@test.mjxts8v.mongodb.net/?retryWrites=true&w=majority&appName=test'
 new MongoClient(url).connect().then((client)=>{
   console.log('DB연결성공')
   db = client.db('forum')
