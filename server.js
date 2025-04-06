@@ -10,7 +10,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 
 let db
-const url = 'mongodb+srv://admin:password@test.mjxts8v.mongodb.net/?retryWrites=true&w=majority&appName=test'
+const url = 'mongodb+srv://admin:password*@test.mjxts8v.mongodb.net/?retryWrites=true&w=majority&appName=test'
 new MongoClient(url).connect().then((client)=>{
   console.log('DB연결성공')
   db = client.db('forum')
@@ -107,7 +107,24 @@ app.put('/edit', async (req, res) => {
     }
 })
 
+
+//Delete Post
 app.delete('/delete', async (req, res) =>{
     let result = await db.collection('post').deleteOne({_id : new ObjectId(req.query.postId)})
     res.send('삭제완료') // ajax로 서버에 요청하는 경우는 render, redirect 사용 안 하는 게 좋음. ajax는 새로고침 안 하는 게 장점이라서.
+})
+
+
+//Pagenation
+app.get('/list/:listId', async (req, res) => {
+    let result = await db.collection('post').find()
+    .skip(5 * (req.params.listId - 1)).limit(5).toArray() //skip => 성능 안 좋음. 
+    res.render('list.ejs', {posts : result})
+})
+
+app.get('/list/next/:postId', async (req, res) => {
+    let result = await db.collection('post')
+    .find({_id : {$gt : new ObjectId(req.params.postId)}}) 
+    .limit(5).toArray() //성능 걱정 없이 구현할 수 있음. 
+    res.render('list.ejs', {posts : result})
 })
